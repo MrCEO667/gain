@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Gain">
+  <meta name="theme-color" content="#000000">
+  <title>Gain</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span id="conn" class="dot" title="Connection"></span>Gain</div>
+    <button id="modeChip" class="chip" type="button" aria-label="Switch between spar and listen mode">Spar</button>
+    <button id="stopAll" class="stop" type="button" aria-label="Stop all agents">Stop all</button>
+  </header>
+
+  <main>
+    <section id="view-talk" class="view active" aria-label="Talk">
+      <div id="taskStrip" class="strip" hidden></div>
+      <div id="proposal" class="card proposal" hidden>
+        <div class="card-label">Proposed task</div>
+        <div id="proposalTitle" class="card-title"></div>
+        <details><summary>Instructions</summary><pre id="proposalPrompt"></pre></details>
+        <div class="row">
+          <button id="proposalStart" class="primary" type="button">Start</button>
+          <button id="proposalDismiss" type="button">Dismiss</button>
+        </div>
+      </div>
+      <div id="transcript" class="transcript" aria-live="polite"></div>
+      <form id="composer" class="composer" autocomplete="off">
+        <div class="autosend"><div id="autosendBar"></div></div>
+        <div class="row">
+          <textarea id="input" rows="2" placeholder="Tap here, then dictate with Wispr Flow" enterkeyhint="send"></textarea>
+          <button id="mic" class="icon" type="button" hidden aria-label="Dictate with built-in mic">Mic</button>
+          <button id="send" class="primary icon" type="submit" aria-label="Send">Send</button>
+        </div>
+        <div id="hint" class="hint"></div>
+      </form>
+    </section>
+
+    <section id="view-tasks" class="view" aria-label="Tasks">
+      <h2>Agent tasks</h2>
+      <div id="tasks"></div>
+    </section>
+
+    <section id="view-brief" class="view" aria-label="Brief">
+      <div class="row spread">
+        <h2>Brief</h2>
+        <div class="row">
+          <button id="minutesBtn" type="button">Write minutes</button>
+          <button id="briefRefresh" type="button">Refresh</button>
+        </div>
+      </div>
+      <article id="brief" class="md"></article>
+    </section>
+
+    <section id="view-settings" class="view" aria-label="Settings">
+      <h2>Settings</h2>
+      <fieldset>
+        <legend>Voice</legend>
+        <label class="toggle"><input type="checkbox" id="setSpeak"> Speak replies</label>
+        <label class="toggle"><input type="checkbox" id="setAnnounce"> Announce agent updates</label>
+        <label class="toggle"><input type="checkbox" id="setEarcons"> Short sounds on send and errors</label>
+        <label>English voice <select id="setVoiceEn"></select></label>
+        <label>Russian voice <select id="setVoiceRu"></select></label>
+        <label>Speed <input type="range" id="setRate" min="0.7" max="1.6" step="0.05"> <span id="rateVal"></span></label>
+        <button id="testVoice" type="button">Test voice</button>
+        <p class="note">Better voices: iPhone Settings → Accessibility → Spoken Content → Voices → download an "Enhanced" or "Premium" voice, then reopen Gain.</p>
+      </fieldset>
+      <fieldset>
+        <legend>Sending</legend>
+        <label class="toggle"><input type="checkbox" id="setAutoSend"> Send automatically after dictation</label>
+        <label>Wait before sending <input type="range" id="setDelay" min="1" max="6" step="0.5"> <span id="delayVal"></span></label>
+        <p class="note">Ending with "over", "send it", "отправь" or "приём" sends right away.</p>
+        <label class="toggle"><input type="checkbox" id="setMic"> Show built-in mic button (fallback if Wispr Flow is unavailable)</label>
+        <label>Built-in mic language <select id="setMicLang"><option value="en-US">English</option><option value="ru-RU">Русский</option></select></label>
+      </fieldset>
+      <fieldset>
+        <legend>Walking</legend>
+        <label class="toggle"><input type="checkbox" id="setAwake"> Keep the screen on (replies stop if the phone locks)</label>
+        <label class="toggle"><input type="checkbox" id="setGuard"> Pocket guard: black screen after a pause, hold to talk</label>
+        <label>Pocket guard after <input type="range" id="setGuardDelay" min="5" max="60" step="5"> <span id="guardVal"></span></label>
+      </fieldset>
+      <fieldset>
+        <legend>Connection</legend>
+        <label>Access token <input type="password" id="setToken" autocomplete="off" spellcheck="false"></label>
+        <button id="saveToken" type="button">Save token</button>
+        <pre id="serverInfo" class="note"></pre>
+      </fieldset>
+    </section>
+  </main>
+
+  <nav class="tabs" aria-label="Views">
+    <button data-view="talk" class="active" type="button">Talk</button>
+    <button data-view="tasks" type="button">Tasks <span id="taskBadge" class="badge" hidden></span></button>
+    <button data-view="brief" type="button">Brief</button>
+    <button data-view="settings" type="button">Settings</button>
+  </nav>
+
+  <div id="startOverlay" class="overlay">
+    <div class="overlay-inner">
+      <h1>Gain</h1>
+      <p>Think out loud. Agents work on your computer.</p>
+      <button id="startWalk" class="primary big" type="button">Start walk</button>
+      <p id="installHint" class="note" hidden>Tip: tap Share → <b>Add to Home Screen</b> to use Gain like an app.</p>
+    </div>
+  </div>
+
+  <div id="guard" class="overlay guard" hidden>
+    <div class="guard-ring" id="guardRing"></div>
+    <p>Hold to talk</p>
+  </div>
+
+  <dialog id="logDialog">
+    <pre id="logText"></pre>
+    <form method="dialog"><button>Close</button></form>
+  </dialog>
+</body>
+</html>
