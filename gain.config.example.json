@@ -1,0 +1,47 @@
+{
+  "port": 8787,
+  "llm": {
+    "provider": "ollama",
+    "baseUrl": "http://127.0.0.1:11434",
+    "model": "qwen3:8b",
+    "think": false,
+    "numCtx": 8192
+  },
+  "agent": {
+    "command": [
+      "aider",
+      "--model", "ollama_chat/qwen2.5-coder:7b",
+      "--yes-always",
+      "--no-suggest-shell-commands",
+      "--no-detect-urls",
+      "--no-gitignore",
+      "--no-show-model-warnings",
+      "--no-check-update",
+      "--no-show-release-notes",
+      "--analytics-disable",
+      "--no-pretty",
+      "--no-stream",
+      "--no-fancy-input",
+      "--message-file", "{promptFile}"
+    ],
+    "env": { "OLLAMA_API_BASE": "http://127.0.0.1:11434" },
+    "timeoutMinutes": 30
+  },
+  "projects": [
+    {
+      "name": "gain",
+      "path": ".",
+      "baseBranch": "",
+      "description": "Gain itself: the voice companion server and phone app.",
+      "check": ["npm", "test"]
+    },
+    {
+      "name": "myapp",
+      "path": "C:/Users/YOU/code/myapp",
+      "baseBranch": "main",
+      "description": "Describe the project in one sentence so the architect knows when to use it.",
+      "check": []
+    }
+  ],
+  "defaultProject": "gain"
+}
