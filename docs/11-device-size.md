@@ -40,6 +40,11 @@ instead of making one hot spot under the thumb. Aluminium moves heat about 20 ti
 | **Aluminium (6061 or 7075, anodized)** | **~130–170** | **~115 g** | **First prototype and first product.** Best at spreading heat, lightest, easiest to machine on CNC, wide choice of anodized colours |
 | Titanium (grade 5) | ~7 | ~125–140 g | A later premium edition, with a copper or graphite heat spreader inside to make up for it |
 | Ceramic (zirconia) | ~2–3 | ~160 g | Not for the main body: traps heat and is heaviest. Possible for small decorative parts |
+| Carbon fibre (incl. forged carbon) | ~5–10 along the surface, ~1 through it | ~100 g | Not for the whole body: spreads heat poorly, and it conducts electricity, so it blocks radio like metal does. Good as a face panel over the battery side of an aluminium body |
+
+**Carbon option:** an aluminium frame and processor side that carry the heat, plus a forged carbon panel on the
+battery side, which stays cool. The ends stay non-conductive (polymer, glass or the brand's material), because carbon
+would block the antennas.
 
 The ends of the body, which must let radio through, are made of a glass-filled polymer on the first prototype.
 Later they can be the brand partner's material.
