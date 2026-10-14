@@ -122,7 +122,8 @@ pre { white-space: pre-wrap; word-break: break-word; font: 14px/1.4 ui-monospace
 }
 .composer textarea:focus { outline: none; border-color: var(--accent); }
 .icon { min-width: 64px; height: 56px; }
-#mic.recording { background: var(--bad); border-color: var(--bad); color: #fff; }
+#mic.recording { background: var(--bad); border-color: var(--bad); color: #fff; animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 .autosend { height: 3px; background: transparent; margin-bottom: 6px; border-radius: 2px; overflow: hidden; }
 .autosend > div { height: 100%; width: 0; background: var(--accent); }
 .autosend > div.run { width: 100%; transition-property: width; transition-timing-function: linear; }

@@ -38,9 +38,9 @@
       <form id="composer" class="composer" autocomplete="off">
         <div class="autosend"><div id="autosendBar"></div></div>
         <div class="row">
-          <textarea id="input" rows="2" placeholder="Tap here, then dictate with Wispr Flow" enterkeyhint="send"></textarea>
-          <button id="mic" class="icon" type="button" hidden aria-label="Dictate with built-in mic">Mic</button>
-          <button id="send" class="primary icon" type="submit" aria-label="Send">Send</button>
+          <textarea id="input" rows="2" placeholder="Tap mic and speak" enterkeyhint="send"></textarea>
+          <button id="mic" class="primary icon" type="button" hidden aria-label="Dictate with built-in mic">Mic</button>
+          <button id="send" class="icon" type="submit" aria-label="Send">Send</button>
         </div>
         <div id="hint" class="hint"></div>
       </form>
@@ -80,8 +80,8 @@
         <label class="toggle"><input type="checkbox" id="setAutoSend"> Send automatically after dictation</label>
         <label>Wait before sending <input type="range" id="setDelay" min="1" max="6" step="0.5"> <span id="delayVal"></span></label>
         <p class="note">Ending with "over", "send it", "отправь" or "приём" sends right away.</p>
-        <label class="toggle"><input type="checkbox" id="setMic"> Show built-in mic button (fallback if Wispr Flow is unavailable)</label>
-        <label>Built-in mic language <select id="setMicLang"><option value="en-US">English</option><option value="ru-RU">Русский</option></select></label>
+        <label class="toggle"><input type="checkbox" id="setMic"> Built-in mic button</label>
+        <label>Mic language <select id="setMicLang"><option value="auto">Auto-detect</option><option value="en-US">English</option><option value="ru-RU">Русский</option></select></label>
       </fieldset>
       <fieldset>
         <legend>Walking</legend>

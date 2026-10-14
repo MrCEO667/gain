@@ -14,8 +14,8 @@ const DEFAULTS = {
   rate: 1.05,
   autoSend: true,
   delay: 2,
-  mic: false,
-  micLang: 'en-US',
+  mic: true,
+  micLang: 'auto',
   awake: true,
   guard: true,
   guardDelay: 15,
@@ -410,7 +410,7 @@ $('composer').addEventListener('submit', e => {
 })
 
 // ---------------------------------------------------------------------------
-// Built-in mic (fallback when Wispr Flow is not available).
+// Built-in mic (Web Speech API).
 
 const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition
 let recognition = null
@@ -427,9 +427,11 @@ $('mic').addEventListener('click', () => {
   stopSpeaking()
   cancelAutoSend()
   recognition = new Recognition()
-  recognition.lang = settings.micLang
+  recognition.lang = settings.micLang === 'auto'
+    ? (isRussian(input.value) ? 'ru-RU' : 'en-US')
+    : settings.micLang
   recognition.interimResults = true
-  recognition.continuous = false
+  recognition.continuous = true
   const base = input.value.trim() ? `${input.value.trim()} ` : ''
   recognition.onresult = e => {
     let t = ''
@@ -441,7 +443,16 @@ $('mic').addEventListener('click', () => {
   recognition.onend = () => {
     recognition = null
     $('mic').classList.remove('recording')
-    scheduleAutoSend()
+    if (input.value.trim()) {
+      scheduleAutoSend()
+      // Re-listen after the auto-send fires
+      if (settings.autoSend && Recognition && settings.mic) {
+        const tid = setTimeout(() => {
+          if (!input.value.trim()) $('mic').click()
+        }, (settings.delay + 0.5) * 1000)
+        input.addEventListener('focus', () => clearTimeout(tid), { once: true })
+      }
+    }
   }
   recognition.start()
   $('mic').classList.add('recording')
