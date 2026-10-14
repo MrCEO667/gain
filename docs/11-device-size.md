@@ -66,7 +66,7 @@ The battery is the largest single part, and it sets the footprint.
 - **Main module:** an LTE "smart module" that combines the modem, processor, NPU, Wi-Fi and Bluetooth in one pre-certified
   package. These are about **43 × 44 × 2.9 mm**. For the offline brain it needs a strong NPU (QCM6490 class, ~12 TOPS);
   the exact part is still to be chosen with a vendor.
-- **Main board:** about 44 × 70 mm, components on both sides: module, power and charging, eSIM, NFC, three microphones,
+- **Main board:** about 44 × 70 mm, components on both sides: module, power and charging, eSIM, three microphones,
   fingerprint connector, haptics driver, USB-C.
 
 ### 3. Thickness: the board sits on top of the battery
