@@ -1,6 +1,8 @@
-"""Voiceover for the announcement film, spoken by Kokoro-82M (Apache-2.0, runs locally on CPU).
+"""Voiceover for the announcement film, spoken by Kokoro-82M (Apache-2.0) through kokoro-onnx, locally on CPU.
 
-    python audio/voice.py out/audio/vo        # needs: pip install kokoro soundfile (Python 3.10–3.12)
+    pip install kokoro-onnx soundfile
+    # model files: https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.0
+    KOKORO_MODEL=kokoro-v1.0.onnx KOKORO_VOICES=voices-v1.0.bin python audio/voice.py out/audio/vo
 
 Writes one WAV per line (24 kHz mono) plus lines.json with each line's cue and spoken length.
 The cues follow the SHOTS.md timeline; mix.py places the lines and checks that none runs into the next.
@@ -11,7 +13,7 @@ import sys
 
 import numpy as np
 import soundfile as sf
-from kokoro import KPipeline
+from kokoro_onnx import Kokoro
 
 VOICE = os.environ.get('VO_VOICE', 'af_heart')   # Kokoro's highest-rated English voice: calm and warm
 SPEED = float(os.environ.get('VO_SPEED', '0.92'))
@@ -38,13 +40,14 @@ def trim(x, thresh=0.01, pad=0.04, sr=24000):
 
 def main(out_dir):
     os.makedirs(out_dir, exist_ok=True)
-    pipe = KPipeline(lang_code='a')
+    tts = Kokoro(os.environ.get('KOKORO_MODEL', 'kokoro-v1.0.onnx'), os.environ.get('KOKORO_VOICES', 'voices-v1.0.bin'))
     meta = []
     for i, (cue, text) in enumerate(LINES, 1):
-        chunks = [np.asarray(audio) for _, _, audio in pipe(text, voice=VOICE, speed=SPEED)]
-        x = trim(np.concatenate(chunks).astype(np.float32))
+        audio, sr = tts.create(text, voice=VOICE, speed=SPEED, lang='en-us')
+        assert sr == 24000, sr
+        x = trim(np.asarray(audio, dtype=np.float32))
         path = os.path.join(out_dir, f'line{i}.wav')
-        sf.write(path, x, 24000)
+        sf.write(path, x, 24000, subtype='PCM_16')
         meta.append({'line': i, 'cue': cue, 'text': text, 'file': path, 'seconds': round(len(x) / 24000, 3)})
         print(f'line {i}: {len(x) / 24000:.2f} s  "{text}"')
     with open(os.path.join(out_dir, 'lines.json'), 'w') as f:

@@ -62,7 +62,7 @@ def main(score_path, lines_path, out_path):
     n = music.shape[1]
     meta = json.load(open(lines_path))['lines']
     vo = np.zeros(n)
-    target_rms = 0.11
+    target_rms = 0.12
     for i, line in enumerate(meta):
         vsr, x = read_wav(line['file'])
         x = resample(x[0], vsr, SR)
@@ -77,10 +77,10 @@ def main(score_path, lines_path, out_path):
         vo[start:end] += x
         print(f'line {line["line"]}: {line["cue"]:5.2f}–{end / SR:5.2f} s  (next cue {limit / SR:5.2f})')
 
-    # duck the music by up to 8 dB while the voice speaks
+    # duck the music by up to 10 dB while the voice speaks, so it sits ~10 dB under the voice
     env = follower(vo, 0.03, 0.45)
-    duck = 10 ** (-8 * np.clip(env / 0.05, 0, 1) / 20)
-    mix = music * duck * 0.62 + vo[None, :] * 1.0
+    duck = 10 ** (-10 * np.clip(env / 0.05, 0, 1) / 20)
+    mix = music * duck * 0.5 + vo[None, :]
     peak = np.abs(mix).max()
     if peak > 0.98:
         mix *= 0.98 / peak
