@@ -9,8 +9,8 @@ with three.js in headless Chromium and encoded with ffmpeg. Nothing here is part
 
 - A black DLC titanium band whose top chamfer is diamond-cut to bare metal, so one silver line draws the octagon.
 - Black zirconia top and back plates. They are RF-transparent, so they also serve as the NFC, Bluetooth and Wi-Fi windows.
-- **Clean top.** The fingerprint sensor is hidden under the ceramic. When touched, the logo (ring, inner ring, dot)
-  shows through in white light.
+- **Clean top.** The fingerprint sensor is hidden under the ceramic. When touched, a single ring of white light
+  shows through.
 - No visible button: the click is a pressure-sensing end segment of the band. Four hairline breaks on the corner
   facets split the band into LTE antennas.
 - One white light slit on the front edge. Mic ports on the back top chamfer, USB-C on the back wall.

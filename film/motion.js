@@ -1,6 +1,7 @@
 // Animated shots. Query: ?shot=/shots/reveal.js&w=1920&h=1080&pr=1.5
 // A shot module exports { duration, fps?, device?, setup({ THREE, stage, device, ctx }) → { update(t) } }.
-// `device` holds overrides for makeBuild(); the shot then drives camera, lights and device.anim per frame.
+// `device` holds overrides for makeBuild(), or is `false` for a shot without the device; the shot then drives
+// camera, lights and device.anim per frame. The stage (floor, background, lights) can be changed or hidden in setup.
 import { THREE, createStage, modelContext, castShadows } from './lib/studio-core.js';
 import { makeBuild } from './device/gain-device.js';
 
@@ -13,9 +14,12 @@ async function main() {
   const stage = createStage(canvas, { width: W, height: H, pixelRatio: PR });
   const shot = await import(params.get('shot'));
   const ctx = modelContext();
-  const device = await makeBuild(shot.device || {})(ctx);
-  castShadows(device.object);
-  stage.scene.add(device.object);
+  let device = null;
+  if (shot.device !== false) {
+    device = await makeBuild(shot.device || {})(ctx);
+    castShadows(device.object);
+    stage.scene.add(device.object);
+  }
   const api = await shot.setup({ THREE, stage, device, ctx });
   window.__shot = { duration: shot.duration, fps: shot.fps || 30 };
   window.__frame = (t) => { api.update(t); stage.composer.render(); return true; };

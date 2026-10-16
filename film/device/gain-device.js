@@ -1,7 +1,7 @@
 // The Gain device (chosen form, October 2026): a chamfered octagonal slab, 102 × 46 × 13.5 mm.
 // A black DLC titanium band with a diamond-cut top chamfer; black zirconia top and back plates set flush into it.
-// The top is clean: the fingerprint sensor sits hidden under the zirconia and shows only when touched, as the logo
-// (ring, inner ring, dot) in white light. The button is a pressure-sensing end segment of the band. The light is white.
+// The top is clean: the fingerprint sensor sits hidden under the zirconia and shows only when touched, as a single
+// ring of white light through the ceramic (deliberately not a logo: there is no name or mark yet). The button is a pressure-sensing end segment of the band. The light is white.
 // makeBuild(overrides) also renders the smaller 72 × 40 × 11.5 mm study and the earlier dish/button variant.
 // A black DLC titanium band with crisp polished chamfers; black zirconia top and back plates set flush into it.
 // Units: mm. y is up and the object rests on y = 0. x = length (-x: button end, +x: lanyard end), z = width (+z: front, light slit).
@@ -289,7 +289,7 @@ return function build(ctx) {
   }
 
   // ------------------------------------------------------------------ hidden fingerprint sensor: invisible under the zirconia until touched,
-  // then the logo appears in white light through the ceramic (outer ring, fainter inner ring, centre dot). Only in the 'touch' view.
+  // then a single ring of white light shows through the ceramic with a soft bloom around it. Only in the 'touch' view.
   const touchParts = [];
   if (!P.DISH) {
     const glow = (r0, r1, k) => {
@@ -303,7 +303,7 @@ return function build(ctx) {
       const TS = 128, data = new Uint8Array(TS * TS * 4);
       for (let j = 0; j < TS; j++) for (let i = 0; i < TS; i++) {
         const u = (i + 0.5) / TS * 2 - 1, v = (j + 0.5) / TS * 2 - 1, r = Math.hypot(u, v);
-        const k = Math.exp(-((r - 0.55) ** 2) * 26) * 0.9 + Math.exp(-(r * r) * 30) * 0.35;
+        const k = Math.exp(-((r - 0.55) ** 2) * 26) * 0.9;
         const o = 4 * (j * TS + i); data[o] = data[o + 1] = data[o + 2] = Math.round(255 * Math.min(1, k) * (r < 1 ? 1 : 0)); data[o + 3] = 255;
       }
       const tex = new THREE.DataTexture(data, TS, TS); tex.needsUpdate = true; tex.magFilter = THREE.LinearFilter; tex.minFilter = THREE.LinearFilter;
@@ -312,8 +312,6 @@ return function build(ctx) {
       m.renderOrder = 3; touchParts.push({ mesh: m, base: m.material.color.clone() });
     }
     glow(R - 0.22, R + 0.22, 1.25);
-    glow(R * 0.47 - 0.16, R * 0.47 + 0.16, 0.7);
-    glow(0, R * 0.15, 1.1);
   }
 
   // Animation handles: k in [0, 1] scales the light. setTouch(1) shows the logo through the ceramic; setSlit(0) turns the slit off.
