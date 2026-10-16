@@ -1,0 +1,13 @@
+{
+  "name": "gain-film",
+  "private": true,
+  "description": "3D device model and render scripts for the Gain concept film. Not part of the app.",
+  "type": "module",
+  "scripts": {
+    "stills": "node render.mjs device",
+    "shot": "node render-shot.mjs"
+  },
+  "devDependencies": {
+    "three": "0.169.0"
+  }
+}
