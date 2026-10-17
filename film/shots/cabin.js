@@ -1,7 +1,7 @@
 // Shot 5 · cabin: forty-one thousand feet. A private-jet cabin at altitude: an ivory sidewall with one large oval
 // window set in a deep, rounded reveal. Outside, a sunlit sea of cloud tops under a pale sky drifts past. Warm sun
-// through the window lays an oval of light across a polished walnut side table where the device lies, its slit
-// breathing softly. One slow lateral dolly along the table toward the window. Quiet, expensive, unhurried.
+// through the window lays a long oval of light across a polished walnut side table; the device lies at its edge,
+// dark against the glow, its slit breathing softly. One slow lateral dolly along the table toward the window.
 import { Reflector } from 'three/addons/objects/Reflector.js';
 import { track, easeInOut, clamp } from '../lib/anim.js';
 
@@ -93,7 +93,7 @@ export function setup({ THREE, stage, device, ctx }) {
   const sunDir = new THREE.Vector3(0.5, 0.52, -0.6).normalize();       // toward the sun: beyond the window, high, a little forward
   const sun = lights.key;
   sun.color.set(0xffe8cc);
-  sun.intensity = 11;
+  sun.intensity = 6;
   sun.target.position.set(60, 0, -40); scene.add(sun.target);
   sun.position.copy(sun.target.position).addScaledVector(sunDir, 1000);
   Object.assign(sun.shadow.camera, { left: -820, right: 820, top: 820, bottom: -820, near: 200, far: 2400 });
