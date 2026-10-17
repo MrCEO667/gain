@@ -34,14 +34,26 @@ A shot is a module in `shots/` exporting `duration` and `setup({ THREE, stage, d
 `update(t)`. `device.anim.setSlit(k)` and `device.anim.setTouch(k)` drive the lights. In software WebGL, 1080p
 renders at about 2 s per frame.
 
-## Script draft (30 s)
+## The film
 
-| Time | Picture | On screen |
-|---|---|---|
-| 0:00–0:04 | Raking light across a fluted marble column | *Aristotle did his best thinking on foot.* |
-| 0:04–0:08 | Notifications pile up and blur into noise, then fall away to black | *Today, the best minds are buried in screens.* |
-| 0:08–0:13 | **Reveal** (`shots/reveal.js`): a line of light draws the chamfer, the white slit wakes | *Gain. No screen. No feed. Just your voice.* |
-| 0:13–0:19 | **Touch**: the logo lights up through the ceramic, then the voice becomes words and the words become work | *Think out loud. Agents build while you move.* |
-| 0:19–0:24 | Jet cabin, oval window, clouds. The device on a walnut table, the slit breathing | *Offline at 41,000 feet. Done when you land.* |
-| 0:24–0:27 | A desk at dusk with the real Brief page on screen | *Come back to finished work.* |
-| 0:27–0:30 | End card: the logo in white light | *Gain. Heads up. Work done.* (small: *Concept film*) |
+`SHOTS.md` has the locked 30-second timeline, the voiceover lines and a brief for each shot. It is a "coming soon"
+announcement with **no product name or logo** anywhere. Narration and an original score replace subtitles; the only
+title is "Coming soon" at the end.
+
+```
+# 1. shots (about 2–4 s per frame each; out/ is git-ignored)
+for s in marble noise reveal listen cabin desk end; do node render-shot.mjs shots/$s.js; done
+
+# 2. score: original, synthesised with numpy and timed to the cuts
+python3 audio/score.py out/audio/score.wav
+
+# 3. voiceover: Kokoro-82M via kokoro-onnx (pip install kokoro-onnx soundfile; Python 3.10–3.12;
+#    model files from github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.0)
+KOKORO_MODEL=kokoro-v1.0.onnx KOKORO_VOICES=voices-v1.0.bin python audio/voice.py out/audio/vo
+
+# 4. mix (music ducks ~10 dB under the voice) and cut (end title, -16 LUFS, H.264 + AAC)
+python3 audio/mix.py out/audio/score.wav out/audio/vo/lines.json out/audio/mix.wav
+node assemble.mjs --out out/announcement-film.mp4
+```
+
+`node assemble.mjs --placeholders` cuts a rough version with grey slates for shots that aren't rendered yet.

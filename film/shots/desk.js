@@ -96,10 +96,10 @@ export async function setup({ THREE, stage, device, ctx }) {
     const hy = Math.round((1 - (HORIZON - CY0) / CH) * H);   // horizon row
     // dusk: deep slate overhead, the last of the light a warm grey along the horizon
     const sky = g.createLinearGradient(0, 0, 0, hy);
-    sky.addColorStop(0, '#0a0b0e'); sky.addColorStop(0.5, '#121418'); sky.addColorStop(0.85, '#22242a'); sky.addColorStop(1, '#3a3632');
+    sky.addColorStop(0, '#0a0b0e'); sky.addColorStop(0.5, '#131519'); sky.addColorStop(0.82, '#25272c'); sky.addColorStop(1, '#45403a');
     g.fillStyle = sky; g.fillRect(0, 0, W, hy);
     const ground = g.createLinearGradient(0, hy, 0, H);
-    ground.addColorStop(0, '#2a2622'); ground.addColorStop(0.08, '#1a1816'); ground.addColorStop(0.45, '#0e0d0d'); ground.addColorStop(1, '#070708');
+    ground.addColorStop(0, '#45403a'); ground.addColorStop(0.04, '#2c2925'); ground.addColorStop(0.12, '#191715'); ground.addColorStop(0.45, '#0e0d0d'); ground.addColorStop(1, '#070708');
     g.fillStyle = ground; g.fillRect(0, hy, W, H - hy);
     // a far skyline, out of focus: soft towers just darker than the sky
     g.filter = 'blur(14px)';
@@ -129,14 +129,13 @@ export async function setup({ THREE, stage, device, ctx }) {
       for (let i = 0; i < n; i++) disc(x + rand() * w, hy - rand() * h * 0.9, 19 + rand() * 4, 0.07 + Math.pow(rand(), 2) * 0.3, tints[Math.floor(rand() * tints.length)]);
     }
     // the city spread out below: dense toward the horizon, thinning as it comes nearer
-    for (let i = 0; i < 1500; i++) {
-      const x = rand() * W;
+    for (let i = 0; i < 560; i++) {
+      const x = 600 + rand() * 2500;                                     // only this band is ever seen through the window
       const y = hy + 6 + Math.pow(rand(), 1.5) * (H - hy) * 0.85;
-      const dens = fbm(x * 0.003, y * 0.006, 3);                         // districts, streets and dark gaps
-      if (dens < 0.3 + rand() * 0.18) continue;
+      const dens = clamp(fbm(x * 0.003, y * 0.006, 3) * 1.6 - 0.3);      // brighter districts, quieter gaps
       const near = clamp((y - hy) / (H - hy));
       const r = (19 + rand() * 5) * (1 + near * 0.45);
-      const a = (0.06 + Math.pow(rand(), 2.4) * 0.4) * (1 - near * 0.5);
+      const a = (0.04 + Math.pow(rand(), 2.4) * 0.3) * (0.35 + 0.9 * dens) * (1 - near * 0.5);
       disc(x, y, r, a, tints[Math.floor(rand() * tints.length)]);
     }
     g.globalCompositeOperation = 'source-over';
@@ -149,17 +148,18 @@ export async function setup({ THREE, stage, device, ctx }) {
   function walnutTexture() {
     const W = 3072, H = 1536, c = document.createElement('canvas'); c.width = W; c.height = H;
     const g = c.getContext('2d'), img = g.createImageData(W, H), px = img.data;
-    const dark = [34, 23, 16], mid = [66, 46, 32], light = [100, 71, 50];
+    const dark = [42, 28, 19], mid = [82, 57, 39], light = [120, 86, 60];
     for (let j = 0; j < H; j++) {
       const v = j / H * DD;
       for (let i = 0; i < W; i++) {
         const u = i / W * DL;
         const warp = (fbm(u * 0.0016, v * 0.012, 3) - 0.5) * 70 + Math.sin(u * 0.0031 + v * 0.011) * 9;
         const w = v + warp;
-        const band = 0.5 + 0.5 * Math.sin(w * 0.42 + fbm(u * 0.004, v * 0.05, 2) * 6);
+        const band = 0.5 + 0.5 * Math.sin(w * 0.31 + fbm(u * 0.004, v * 0.05, 2) * 9) * (0.6 + 0.4 * Math.sin(w * 0.071 + u * 0.002));
         const figure = fbm(u * 0.0011 + 7, w * 0.03, 3);
+        const streak = fbm(u * 0.0008, w * 0.22, 3);                     // fine, uneven grain lines
         const pores = vnoise(u * 0.09, w * 1.6) * vnoise(u * 0.035 + 3, w * 0.9);
-        const k = clamp(0.18 + 0.5 * figure + 0.28 * Math.pow(band, 3) - 0.22 * Math.pow(pores, 2));
+        const k = clamp(0.12 + 0.46 * figure + 0.18 * Math.pow(band, 3) + 0.22 * streak - 0.22 * Math.pow(pores, 2));
         const col = k < 0.5 ? dark.map((d, n) => d + (mid[n] - d) * (k / 0.5)) : mid.map((m, n) => m + (light[n] - m) * ((k - 0.5) / 0.5));
         const o = 4 * (j * W + i);
         px[o] = col[0]; px[o + 1] = col[1]; px[o + 2] = col[2]; px[o + 3] = 255;
@@ -191,24 +191,24 @@ export async function setup({ THREE, stage, device, ctx }) {
   // the stage key and fill are off; a warm desk lamp off frame (left, high, in front) lays a soft pool on the desk
   lights.key.intensity = 0; lights.key.castShadow = false;
   lights.fill.intensity = 0;
-  const lamp = new THREE.SpotLight(0xffeedd, 3.6, 0, 0.36, 1.0, 0);
-  lamp.position.set(-860, 1150, 60); lamp.target.position.set(170, 0, -110);
+  const lamp = new THREE.SpotLight(0xffeedd, 3.4, 0, 0.33, 1.0, 0);
+  lamp.position.set(-820, 1200, 40); lamp.target.position.set(110, 0, -90);
   lamp.castShadow = true; lamp.shadow.mapSize.set(2048, 2048);
   lamp.shadow.camera.near = 300; lamp.shadow.camera.far = 3000;
-  lamp.shadow.bias = -0.0002; lamp.shadow.normalBias = 0.6; lamp.shadow.radius = 3;
+  lamp.shadow.bias = -0.00012; lamp.shadow.normalBias = 0.2; lamp.shadow.radius = 3;
   scene.add(lamp, lamp.target);
   // dusk through the window: a faint, slightly cool rim from behind
-  lights.rim.color.set(0xe4e8ee); lights.rim.intensity = 0.35; lights.rim.position.set(-200, 900, -2400);
+  lights.rim.color.set(0xe4e8ee); lights.rim.intensity = 0.25; lights.rim.position.set(-900, 2000, -1800);   // high, so the polished tops don't mirror it
   lights.hemi.color.set(0xd8dce2); lights.hemi.groundColor.set(0x000000); lights.hemi.intensity = 0.05;
   // the screen's own glow on the desk, keys and device
-  const glow = new THREE.RectAreaLight(0xece9e3, 0.3, SW, SH);
+  const glow = new THREE.RectAreaLight(0xece9e3, 0.1, SW, SH);
   glow.position.set(SX, SY, SZ + 1); glow.lookAt(SX, SY, SZ + 1000);
   scene.add(glow);
 
   const shadowed = (m, cast = true, receive = true) => { m.castShadow = cast; m.receiveShadow = receive; return m; };
 
   // ------------------------------------------------------------------ the window wall and the city beyond
-  const WIN = { x0: -980, x1: 900, y0: 150, y1: 2600 };
+  const WIN = { x0: -980, x1: 900, y0: 40, y1: 2600 };
   {
     const s = new THREE.Shape();
     s.moveTo(-4000, -900); s.lineTo(4000, -900); s.lineTo(4000, 3200); s.lineTo(-4000, 3200); s.closePath();
@@ -240,7 +240,7 @@ export async function setup({ THREE, stage, device, ctx }) {
     const g = new ctx.RoundedBoxGeometry(DL, 32, DD, 4, 6);
     const p = g.attributes.position, uv = g.attributes.uv;
     for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / DL + 0.5, 1 - (p.getZ(i) / DD + 0.5));
-    const walnut = new THREE.MeshPhysicalMaterial({ map: walnutTexture(), roughness: 0.62, specularIntensity: 0.3, clearcoat: 0.3, clearcoatRoughness: 0.34, envMapIntensity: 0.9 });
+    const walnut = new THREE.MeshPhysicalMaterial({ map: walnutTexture(), roughness: 0.7, specularIntensity: 0.16, clearcoat: 0.12, clearcoatRoughness: 0.42, envMapIntensity: 0.9 });
     const top = shadowed(new THREE.Mesh(g, walnut), false);
     top.position.set(0, -16, (DZ0 + DZ1) / 2); scene.add(top);
   }
